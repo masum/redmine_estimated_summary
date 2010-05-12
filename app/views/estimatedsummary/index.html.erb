@@ -1,0 +1,49 @@
+<script src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
+<%= stylesheet_link_tag "style", :plugin => "redmine_estimated_summary", :media => "screen" %>
+<%= javascript_include_tag "script.js", :plugin => "redmine_estimated_summary" %>
+<script>
+jQuery.noConflict();
+var baseurl = "<%= @esurl %>"
+var items = [
+ {name:"<%= l(:field_category) %>",data:"category"},
+ {name:"<%= l(:field_fixed_version) %>",data:"version"},
+ {name:"<%= l(:field_assigned_to) %>",data:"assigned"},
+ {name:"<%= l(:field_priority) %>",data:"priority"},
+ {name:"<%= l(:field_status) %>",data:"status"},
+ {name:"<%= l(:field_tracker) %>",data:"tracker"}
+]
+jQuery(document).bind("ready",function() {
+  jQuery.each(items,function(i,v) {
+    jQuery("<option>").attr("value",v.data).text(v.name).appendTo(jQuery("#s1"));
+  });
+  function setS2() {
+    jQuery("#s2 *").remove();
+    var s1=jQuery("#s1").get(0);
+    var c=s1.options[s1.selectedIndex].value;
+    jQuery.each(items,function(i,v) {
+      if (c!=v.data) {
+        jQuery("<option>").attr("value",v.data).text(v.name).appendTo(jQuery("#s2"));
+      }
+    });
+  }
+  setS2();
+  jQuery("#s1").bind("change",function() {
+    setS2();
+  });
+});
+function click() {
+  s1 = document.getElementById("s1");
+  s1 = s1.options[s1.selectedIndex].value;
+  s2 = document.getElementById("s2");
+  s2 = s2.options[s2.selectedIndex].value;
+  var url = baseurl + "/getlist/"+s2 + "/"+ s1;
+  jQuery.get(url,function(res) {
+    jQuery("#listcontent").html(res);
+  });
+}
+</script>
+<body>
+<%= l(:label_display) %><select id="s1"></select><%= l(:field_group_by) %><select id="s2"></select>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="click()"><%= l(:button_apply) %></a>
+<hr>
+<div id="listcontent">
+</div>

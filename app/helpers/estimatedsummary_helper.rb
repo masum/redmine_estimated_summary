@@ -1,0 +1,2 @@
+module EstimatedsummaryHelper
+end
