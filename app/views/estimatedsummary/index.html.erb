@@ -1,6 +1,4 @@
 <script src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
-<%= stylesheet_link_tag "style", :plugin => "redmine_estimated_summary", :media => "screen" %>
-<%= javascript_include_tag "script.js", :plugin => "redmine_estimated_summary" %>
 <script>
 jQuery.noConflict();
 var baseurl = "<%= @esurl %>"
@@ -32,18 +30,25 @@ jQuery(document).bind("ready",function() {
   });
 });
 function click() {
+  jQuery(".loadingicon").show();
+  jQuery("#listcontent *").remove();
   s1 = document.getElementById("s1");
   s1 = s1.options[s1.selectedIndex].value;
   s2 = document.getElementById("s2");
   s2 = s2.options[s2.selectedIndex].value;
   var url = baseurl + "/getlist/"+s2 + "/"+ s1;
   jQuery.get(url,function(res) {
+    jQuery(".loadingicon").hide();
     jQuery("#listcontent").html(res);
   });
 }
 </script>
+<style>
+.loadingicon{display:none;}
+</style>
 <body>
 <%= l(:label_display) %><select id="s1"></select><%= l(:field_group_by) %><select id="s2"></select>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="click()"><%= l(:button_apply) %></a>
 <hr>
+<%= image_tag "ajax-loader.gif", {:class => "loadingicon",:plugin => "redmine_estimated_summary"} %>
 <div id="listcontent">
 </div>

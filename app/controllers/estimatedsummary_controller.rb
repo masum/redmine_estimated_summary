@@ -40,6 +40,13 @@ class EstimatedsummaryController < ApplicationController
     sql += " LEFT JOIN projects ON i.project_id=projects.id "
     sql += " LEFT JOIN issue_statuses ON i.status_id=issue_statuses.id "
     sql += " WHERE i.project_id=? "
+    sql += " AND "
+    sql += " i.id NOT IN "
+    sql += " (SELECT parent_id  "
+    sql += "  FROM issues "
+    sql += "  WHERE parent_id>0 "
+    sql += "  GROUP BY parent_id "
+    sql += " ) "
     sql += " GROUP BY " + g[key1] + "," + g[key2]
   end
   
