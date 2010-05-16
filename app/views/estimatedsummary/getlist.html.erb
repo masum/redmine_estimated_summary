@@ -15,11 +15,17 @@
 </style>
 <table class="list issues">
 <thead>
-<th><%= @column %></th>
-<th><%= l(:field_estimated_hours) %></th>
-<th><%= l(:field_hours) %></th>
-<th><%= l(:field_done_ratio) %></th>
-<th>ticket</th>
+<tr>
+<th rowspan="2"><%= @column %></th>
+<th rowspan="2"><%= l(:field_estimated_hours) %></th>
+<th rowspan="2"><%= l(:field_hours) %></th>
+<th rowspan="2"><%= l(:field_done_ratio) %></th>
+<th colspan="2">ticket</th>
+</tr>
+<tr>
+<th>new</th>
+<th>closed</th>
+</tr>
 </thead>
 <tbody>
   <% @data.each_pair do |key,value| %>
@@ -27,18 +33,21 @@
       <td colspan="5"><%= key %> &nbsp;(<%= @data[key].size %>)</td>
     </tr>
     <% count = 0 %>
-    <% y=0;j=0;t=0;p=0; %>
+    <% y=0;j=0;t=0;t1=0;t2=0;p=0; %>
     <% @data[key].each do |d| %>
       <% y += d.n3.to_i unless d.n3.nil? %>
       <% j += d.n4.to_i unless d.n4.nil? %>
       <% p += d.n5.to_i unless d.n5.nil?  %>
       <% t += d.n6.to_i unless d.n6.nil?  %>
+      <% t1 += d.n7.to_i unless d.n7.nil?  %>
+      <% t2 += d.n8.to_i unless d.n8.nil?  %>
       <tr class="<%= (count%2 == 0) ? 'odd':'event' %>">
         <td class="col2"><%= d.n2.nil? ? "none" : d.n2 %></td>
         <td class="col3"><%= d.n3.to_s %></td>
         <td class="col4"><%= d.n4.nil? ? "0":d.n4.to_s %></td>
         <td class="col5"><%= d.n5.to_i / d.n6.to_i %>%</td>
-        <td class="col6"><%= d.n6.to_s %></td>
+        <td class="col6"><%= d.n8.to_s %></td>
+        <td class="col6"><%= d.n7.to_s %></td>
       </tr>
       <% count += 1 %>
     <% end %>
@@ -46,8 +55,9 @@
       <th style="text-align:right;">total</th>
       <td><%= y %></td>
       <td><%= j %></td>
-      <td><%= p / @data[key].size %>%</td>
-      <td><%= t %></td>
+      <td><%= p / t %>%</td>
+      <td><%= t2 %></td>
+      <td><%= t1 %></td>
     </tr>
   <% end %>
 </tbody>

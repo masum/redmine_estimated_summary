@@ -6,7 +6,7 @@ class EstimatedsummaryController < ApplicationController
     s={}
     s["version"]  = "versions.name"
     s["category"] = "issue_categories.name"
-    s["assigned"] = "users.firstname"
+    s["assigned"] = "users.lastname"
     s["priority"] = "enumerations.name"
     s["status"]   = "issue_statuses.name"
     s["tracker"]  = "trackers.name"
@@ -18,21 +18,23 @@ class EstimatedsummaryController < ApplicationController
     j["status"]   = ""
     j["tracker"]  = "LEFT JOIN trackers ON i.tracker_id=trackers.id"
     g={}
-    g["version"]  = "fixed_version_id"
-    g["category"] = "category_id"
-    g["assigned"] = "assigned_to_id"
-    g["priority"] = "priority_id"
-    g["status"]   = "status_id"
-    g["tracker"]  = "tracker_id"
+    g["version"]  = "i.fixed_version_id"
+    g["category"] = "i.category_id"
+    g["assigned"] = "i.assigned_to_id"
+    g["priority"] = "i.priority_id"
+    g["status"]   = "i.status_id"
+    g["tracker"]  = "i.tracker_id"
     sql = "SELECT "
     sql += s[key1] + " AS n1,"
+    sql += g[key1] + " AS n1_value, "
     sql += s[key2] + " AS n2,"
+    sql += g[key2] + " AS n2_value, "
     sql += " SUM(estimated_hours) AS n3,"
     sql += " SUM(te.hours) AS n4, "
     sql += " SUM(i.done_ratio) AS n5, "
-    sql += " COUNT(i.id) AS n6 "
-    #sql += " COUNT( CASE WHEN issue_status.is_closed = 1 THEN 1 ELSE 0 END ) AS n6, "
-    #sql += " COUNT( CASE WHEN issue_status.is_closed = 0 THEN 1 ELSE 0 END ) AS n7 "
+    sql += " COUNT(i.id) AS n6, "
+    sql += " SUM( CASE WHEN issue_statuses.is_closed = 1 THEN 1 ELSE 0 END ) AS n7, "
+    sql += " SUM( CASE WHEN issue_statuses.is_closed = 0 THEN 1 ELSE 0 END ) AS n8 "
     sql += " FROM issues AS i "
     sql += " LEFT JOIN time_entries AS te ON i.id=te.issue_id "
     sql += " " + j[key1]
@@ -47,7 +49,8 @@ class EstimatedsummaryController < ApplicationController
     sql += "  WHERE parent_id>0 "
     sql += "  GROUP BY parent_id "
     sql += " ) "
-    sql += " GROUP BY " + g[key1] + "," + g[key2]
+    sql += " GROUP BY " + g[key1] + " ," + g[key2]
+    sql += " ORDER BY n2 ASC , n1 ASC "
   end
   
   def index
